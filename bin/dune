@@ -1,4 +1,4 @@
-(executable
- (public_name day02)
- (name day02)
- (libraries aoc_2023 base stdio core))
+(executables
+ (public_names day01 day02)
+ (names day01 day02)
+ (libraries  advent base stdio core))
