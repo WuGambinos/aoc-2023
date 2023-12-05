@@ -1,9 +1,9 @@
-# dune build
+# dune exec day04
 # OCAMLPARAM: unset
 # Shared cache: disabled
 # Workspace root: /home/kenpachi/Programming/ocaml/aoc/aoc_2023
 # Auto-detected concurrency: 4
-$ /usr/bin/ocamlc.opt -config > /tmp/dune_d43525_output
+$ /usr/bin/ocamlc.opt -config > /tmp/dune_de588c_output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"

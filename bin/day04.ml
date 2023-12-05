@@ -50,25 +50,67 @@ open Stdio
    ;;
 *)
 
+(*
+   let rec handle_copies lst count times =
+   if count = times
+   then lst
+   else (
+   let new_lst = help_handle_copies lst 0 0 times in
+   handle_copies new_lst count times)
+   ;;
+*)
+
+(*
+   (* Increase individual card a "max" amount of times *)
+   let rec help_handle_copies lst i j max =
+   if j >= max
+   then lst
+   else (
+   let new_lst = increase_at_index lst i 1 in
+   help_handle_copies new_lst i (j + 1) max)
+   ;;
+*)
 let increase_at_index lst index incr =
   let res =
     List.mapi lst ~f:(fun i n ->
-         let output = Printf.sprintf "AFTER: CARD: %d VAL %d" (i + 1) n in
-         print_endline output;
+      let output = Printf.sprintf "AFTER: CARD: %d VAL %d" (i + 1) n in
+      print_endline output;
       if i = index then n + incr else n)
   in
   print_endline "";
   res
 ;;
 
-let rec count_up lst og_n n cards_won =
-  if n >= cards_won + og_n
+let rec increment_at_index_n_times lst index n =
+  if n = 0
   then lst
   else (
-    let times = List.nth_exn lst (n - 1) in
-    let new_lst = increase_at_index lst n times in
-    count_up new_lst og_n (n + 1) cards_won)
+    let new_lst = increase_at_index lst index 1 in
+    increment_at_index_n_times new_lst index (n - 1))
 ;;
+
+let help_handle_copies lst start index _cards_won cop =
+  if index = start then lst else increment_at_index_n_times lst (index - 1) cop
+;;
+
+let rec loop (lst : int list) cards_won st ed cop =
+  if st >= ed
+  then lst
+  else (
+    let new_lst = help_handle_copies lst st ed cards_won cop in
+    loop new_lst cards_won st (ed - 1) cop)
+;;
+
+(*
+   let rec count_up lst og_n n cards_won =
+   if n >= cards_won + og_n
+   then lst
+   else (
+   let times = List.nth_exn lst (n - 1) in
+   let new_lst = increase_at_index lst n times in
+   count_up new_lst og_n (n + 1) cards_won)
+   ;;
+*)
 
 let num_cards_won (l1 : int list) (l2 : int list) =
   let res =
@@ -100,7 +142,12 @@ let parse_line (i : int) (track : int list) (line : string) =
     List.nth_exn split_line 1 |> String.strip |> parse_num_list
   in
   let cards_won = num_cards_won winning_numbers my_numbers in
-  let num_list = count_up track (i + 1) (i + 1) cards_won in
+  (*
+     let num_list = count_up track (i + 1) (i + 1) cards_won in
+  *)
+  let output = Printf.sprintf "START: %d END: %d COP: %d" i (i + cards_won + 1) (i + 1) in
+  print_endline output;
+  let num_list = loop track cards_won i (i + cards_won + 1) (i + 1) in
   let _ = print_endline "" in
   let output = Printf.sprintf "CARDS WON: %d" cards_won in
   print_endline output;
@@ -112,7 +159,15 @@ let parse_line (i : int) (track : int list) (line : string) =
 let () =
   let lines = Advent.read_file "inputs/day4/test.txt" in
   let len = List.length lines in
+  (*
   let track_count = List.init len ~f:(fun _n -> 1) in
+     let total_cards =
+     List.foldi lines ~init:0 ~f:(fun idx acc line ->
+     let res = parse_line idx track_count line in
+     acc + res)
+     in
+  *)
+      let track_count = List.init len ~f:(fun _n -> 1) in
   let total_cards =
     List.foldi lines ~init:0 ~f:(fun idx acc line ->
       let res = parse_line idx track_count line in
