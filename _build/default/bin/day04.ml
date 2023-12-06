@@ -49,69 +49,6 @@ open Stdio
    print_endline output
    ;;
 *)
-
-(*
-   let rec handle_copies lst count times =
-   if count = times
-   then lst
-   else (
-   let new_lst = help_handle_copies lst 0 0 times in
-   handle_copies new_lst count times)
-   ;;
-*)
-
-(*
-   (* Increase individual card a "max" amount of times *)
-   let rec help_handle_copies lst i j max =
-   if j >= max
-   then lst
-   else (
-   let new_lst = increase_at_index lst i 1 in
-   help_handle_copies new_lst i (j + 1) max)
-   ;;
-*)
-let increase_at_index lst index incr =
-  let res =
-    List.mapi lst ~f:(fun i n ->
-      let output = Printf.sprintf "AFTER: CARD: %d VAL %d" (i + 1) n in
-      print_endline output;
-      if i = index then n + incr else n)
-  in
-  print_endline "";
-  res
-;;
-
-let rec increment_at_index_n_times lst index n =
-  if n = 0
-  then lst
-  else (
-    let new_lst = increase_at_index lst index 1 in
-    increment_at_index_n_times new_lst index (n - 1))
-;;
-
-let help_handle_copies lst start index _cards_won cop =
-  if index = start then lst else increment_at_index_n_times lst (index - 1) cop
-;;
-
-let rec loop (lst : int list) cards_won st ed cop =
-  if st >= ed
-  then lst
-  else (
-    let new_lst = help_handle_copies lst st ed cards_won cop in
-    loop new_lst cards_won st (ed - 1) cop)
-;;
-
-(*
-   let rec count_up lst og_n n cards_won =
-   if n >= cards_won + og_n
-   then lst
-   else (
-   let times = List.nth_exn lst (n - 1) in
-   let new_lst = increase_at_index lst n times in
-   count_up new_lst og_n (n + 1) cards_won)
-   ;;
-*)
-
 let num_cards_won (l1 : int list) (l2 : int list) =
   let res =
     List.fold l1 ~init:0 ~f:(fun outer_acc outer_num ->
@@ -123,6 +60,34 @@ let num_cards_won (l1 : int list) (l2 : int list) =
       outer_acc + answer)
   in
   res
+;;
+
+let print_lst lst =
+  List.iteri lst ~f:(fun i n ->
+    let output = Printf.sprintf "CARD: %d VAL %d" (i + 1) n in
+    print_endline output)
+;;
+
+let increase_at_index lst index incr =
+  let res =
+    List.mapi lst ~f:(fun i n ->
+      (*
+         let output = Printf.sprintf "AFTER: CARD: %d VAL %d" (i + 1) n in
+         print_endline output;
+      *)
+      if i = index then n + incr else n)
+  in
+  print_endline "";
+  res
+;;
+
+let rec loop lst index start ed =
+  if index > start + ed
+  then lst
+  else (
+    let new_lst = increase_at_index lst index 1 in
+    print_lst new_lst;
+    loop new_lst (index + 1) start ed)
 ;;
 
 let parse_num_list (num_list : string) =
@@ -143,23 +108,26 @@ let parse_line (i : int) (track : int list) (line : string) =
   in
   let cards_won = num_cards_won winning_numbers my_numbers in
   (*
-     let num_list = count_up track (i + 1) (i + 1) cards_won in
+     let num_list = inner_loop track i i (cards_won) in
   *)
-  let output = Printf.sprintf "START: %d END: %d COP: %d" (i) (i + cards_won+1) (i+1) in
-  print_endline output;
-  let num_list = loop track cards_won (i ) (i + cards_won+1) (i+1) in
+  let num_list = loop track i i cards_won in
   let _ = print_endline "" in
   let output = Printf.sprintf "CARDS WON: %d" cards_won in
   print_endline output;
   List.iter num_list ~f:(fun n -> n |> Int.to_string |> print_endline);
-  let sum_of_list = num_list |> List.fold ~init:0 ~f:( + ) in
-  sum_of_list
+  List.fold num_list ~init:0 ~f:( + )
 ;;
+
+(*
+   let rec custom_iter lst track_count j max = if j = max then lst else
+   let new_lst = parse_line 0 track_count ()
+   custom_iter lst j max
+*)
 
 let () =
   let lines = Advent.read_file "inputs/day4/test.txt" in
   let len = List.length lines in
-  let track_count = List.init len ~f:(fun _n -> 1) in
+  let track_count = List.init len ~f:(fun _n -> 0) in
   let total_cards =
     List.foldi lines ~init:0 ~f:(fun idx acc line ->
       let res = parse_line idx track_count line in
