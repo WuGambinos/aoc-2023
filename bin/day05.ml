@@ -8,10 +8,12 @@ type range_info =
   ; length : int
   }
 
-let print_range_info r =
+let _print_range_info r =
   let output =
     Printf.sprintf
-      "DST_START: %d SOURCE_START: %d LEN: %d"
+      "FROM: %s TARGET: %s DST_START: %d SOURCE_START: %d LEN: %d"
+      r.from
+      r.target
       r.dst_start
       r.src_start
       r.length
@@ -27,7 +29,7 @@ let parse_num_list (num_list : string) : int list =
   nums
 ;;
 
-let parse_map_line (map_line : string) : range_info =
+let _parse_map_line (map_line : string) : range_info =
   let num_list = parse_num_list map_line in
   let from = "" in
   let target = "" in
@@ -40,18 +42,29 @@ let parse_map_line (map_line : string) : range_info =
 
 let () =
   let lines = Advent.read_file "inputs/day5/test.txt" in
-  (*
-     List.iter lines ~f:(fun line -> print_endline line);
-     print_endline "";
-  *)
+  List.iter lines ~f:(fun line -> print_endline line);
+  print_endline "";
   let seeds_to_be_planted = lines |> List.hd_exn |> String.split ~on:':' in
   let _seed_nums = parse_num_list (List.last_exn seeds_to_be_planted) in
-  let rest = lines |> List.tl_exn |> List.filter ~f:(fun s -> not (String.is_empty s)) in
-  List.iter rest ~f:(fun line ->
-    if Char.is_alpha (String.get line 0)
-    then ()
-    else (
-      let info = parse_map_line line in
-      print_range_info info));
+  (*
+     let rest = lines |> List.tl_exn |> List.filter ~f:(fun s -> not (String.is_empty s)) in
+  *)
+  (*
+     List.iter rest ~f:(fun line ->
+     if Char.is_alpha (String.get line 0)
+     then ()
+     else (
+     let info = parse_map_line line in
+     print_range_info info));
+  *)
+  (*
+     let map_name_list =
+     List.fold rest ~init:[] ~f:(fun acc line ->
+     let res = if Char.is_alpha (String.get line 0) then line else "" in
+     res :: acc)
+     |> List.filter ~f:(fun s -> not (String.is_empty s))
+     in
+     List.iter map_name_list ~f:(fun s -> print_endline s)
+  *)
   ()
 ;;
