@@ -1,8 +1,8 @@
 open Core
 
 let _ = print_endline "Hello World"
-
-let sort_slice start_pos end_pos lst =
+(*
+   let sort_slice start_pos end_pos lst =
   let slice = List.slice lst start_pos end_pos in
   let sorted_slice = List.sort ~compare slice in
   let prefix = List.take lst start_pos in
@@ -18,3 +18,4 @@ let () =
   printf "Original list: %s\n" (List.to_string ~f:Int.to_string lst);
   printf "Sorted slice: %s\n" (List.to_string ~f:Int.to_string sorted_list)
 ;;
+*)
