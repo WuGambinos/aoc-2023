@@ -53,11 +53,18 @@ let add_values (curr_row : int list) (next_row : int list) =
   x + y
 ;;
 
+let subtract_values (curr_row : int list) (next_row : int list) =
+  let x = List.last_exn curr_row in
+  let y = List.nth_exn next_row (List.length next_row - 2) in
+  y - x
+;;
+
 let rec extrapolate
   (lst : int list list)
   (acc : int list list)
   (next_value : int)
   (i : int)
+  ~part_1
   =
   match lst with
   | [] -> acc
@@ -66,11 +73,11 @@ let rec extrapolate
     let cond = List.hd tl in
     let next_value =
       match cond with
-      | Some tl -> add_values new_list tl
+      | Some tl -> if part_1 then add_values new_list tl else subtract_values new_list tl
       | None -> 0
     in
     let new_acc = new_list :: acc in
-    extrapolate tl new_acc next_value (i + 1)
+    extrapolate tl new_acc next_value (i + 1) ~part_1
 ;;
 
 let () =
@@ -81,12 +88,28 @@ let () =
       let result_list = custom_fold [ nums ] nums in
       let result_list =
         List.fold result_list ~init:[] ~f:(fun inner_acc list ->
-          let res = List.append list [ 0 ] in
-          res :: inner_acc)
+          let result = List.append list [ 0 ] in
+          result :: inner_acc)
       in
-      let final_list = extrapolate result_list [] 0 0 in
+      let final_list = extrapolate result_list [] 0 0 ~part_1:true in
       let extrapolated_val = List.last_exn (List.hd_exn final_list) in
       extrapolated_val + acc)
   in
-  part1_answer |> Int.to_string |> print_endline
+  let part2_answer =
+    List.fold lines ~init:0 ~f:(fun acc line ->
+      let nums = line |> String.split ~on:' ' |> List.map ~f:Int.of_string in
+      let result_list = custom_fold [ nums ] nums in
+      let result_list =
+        List.fold result_list ~init:[] ~f:(fun inner_acc list ->
+          let result = List.rev_append list [ 0 ] in
+          result :: inner_acc)
+      in
+      let final_list = extrapolate result_list [] 0 0 ~part_1:false in
+      let extrapolated_val = List.last_exn (List.hd_exn final_list) in
+      extrapolated_val + acc)
+  in
+  let p1_answer = Printf.sprintf "PART 1 ANSWER: %d" part1_answer in
+  let p2_answer = Printf.sprintf "PART 2 ANSWER: %d" part2_answer in
+  print_endline p1_answer;
+  print_endline p2_answer
 ;;
