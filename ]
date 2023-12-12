@@ -1,0 +1,86 @@
+open Core
+open Stdio
+
+type _pair = int * int
+
+let _print_pair pair =
+  let x, y = pair in
+  let output = Printf.sprintf "FIRST: %d SECOND: %d" x y in
+  print_endline output
+;;
+
+let print_list (list : int list) =
+  List.iter list ~f:(fun n ->
+    let output = Printf.sprintf "%d " n in
+    print_string output);
+  print_endline ""
+;;
+
+let diff_between_pairs pair =
+  let x, y = pair in
+  y - x
+;;
+
+let all_zero list =
+  List.fold list ~init:true ~f:(fun acc n ->
+    let result = if n = 0 then true else false in
+    result && acc)
+;;
+
+let collect_differences pairs =
+  List.fold pairs ~init:[] ~f:(fun acc pair ->
+    let result = diff_between_pairs pair in
+    result :: acc)
+;;
+
+let rec pairs_of_list lst =
+  match lst with
+  | [] | [ _ ] -> []
+  | x :: y :: rest -> (x, y) :: pairs_of_list (y :: rest)
+;;
+
+let rec custom_fold (acc : int list) (list : int list) : int list =
+  if all_zero list
+
+  then 
+      let _ = print_list list in 
+      let _ = print_endline "" in
+      acc
+  else (
+    let pairs = pairs_of_list list in
+    (*
+       List.iter pairs ~f:print_pair;
+    *)
+    print_list list;
+    print_endline "";
+    let differences : int list = pairs |> collect_differences |> List.rev in
+    let result = List.append acc differences in
+    custom_fold result differences)
+;;
+
+let () =
+  let lines = Advent.read_file "inputs/day9/test.txt" in
+  let first = List.last_exn lines in
+  let nums = String.split first ~on:' ' in
+  let nums = List.map nums ~f:Int.of_string in
+  let zero = custom_fold [] nums in
+  print_list zero;
+  (*
+     let _nums_list_list =
+     List.fold lines ~init:[] ~f:(fun outer_acc line ->
+     let nums = String.split line ~on:' ' in
+     let nums = List.map nums ~f:Int.of_string in
+     let pairs = pairs_of_list nums in
+     let differences = collect_differences pairs in
+     List.iter differences ~f:(fun diff ->
+     let output = Printf.sprintf "DIFF: %d " diff in
+     print_string output);
+     print_endline "";
+     nums :: outer_acc)
+     |> List.rev
+  *)
+  ()
+;;
+(*
+   List.iter nums_list_list ~f:(fun list -> print_list list)
+*)
