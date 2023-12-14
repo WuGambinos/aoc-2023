@@ -113,7 +113,7 @@ let extract_some (galaxies_map : galaxy option list list) : galaxy list list =
   res
 ;;
 
-let part_1 file =
+let sum_of_distances file n =
   let lines = Advent.read_file file in
   let lines =
     List.fold lines ~init:[] ~f:(fun acc line ->
@@ -122,9 +122,9 @@ let part_1 file =
   in
   let lines =
     lines
-    |> add_extra_space 2
+    |> add_extra_space n
     |> List.transpose_exn
-    |> add_extra_space 2
+    |> add_extra_space n
     |> List.transpose_exn
   in
   let lines =
@@ -166,72 +166,19 @@ let part_1 file =
   answer
 ;;
 
-let part2_helper n =
-  let lines = Advent.read_file "inputs/day11/input.txt" in
-  let lines =
-    List.fold lines ~init:[] ~f:(fun acc line ->
-      let result = String.to_list line in
-      result :: acc)
-  in
-  let lines =
-    lines
-    |> add_extra_space n
-    |> List.transpose_exn
-    |> add_extra_space n
-    |> List.transpose_exn
-  in
-  let lines =
-    List.fold lines ~init:[] ~f:(fun acc line ->
-      let result = List.rev line in
-      result :: acc)
-    |> List.rev
-  in
-  let lines = lines |> replace_hashes_with_numbers in
-  let lines =
-    List.foldi lines ~init:[] ~f:(fun i acc row ->
-      let result =
-        List.mapi row ~f:(fun j n ->
-          if n = 0
-          then None
-          else (
-            let g : galaxy = { x = i; y = j; ident = n } in
-            Some g))
-      in
-      result :: acc)
-    |> List.rev
-  in
-  let galaxies = lines |> filter_none |> extract_some |> List.concat in
-  let pairs =
-    galaxies
-    |> outer_collect_galaxy_pairs
-    |> List.sort ~compare:compare_pair
-    |> List.remove_consecutive_duplicates ~equal:equal_pair
-    |> List.filter ~f:(fun pair ->
-      let left, right = pair in
-      not (left.ident = right.ident))
-  in
-  let final_result =
-    List.fold pairs ~init:0 ~f:(fun acc pair ->
-      let first, second = pair in
-      let result = manhattan_distance first second in
-      result + acc)
-  in
-  final_result
-;;
-
-let part_2 n =
+let part_2 file n =
   let x1 = 10 in
   let x2 = 100 in
-  let y1 = part2_helper x1 in
-  let y2 = part2_helper x2 in
+  let y1 = sum_of_distances file x1 in
+  let y2 = sum_of_distances file x2 in
   let m = (y2 - y1) / (x2 - x1) in
   let eq x = (m * (x - x1)) + y1 in
   eq n
 ;;
 
 let _ =
-  let part1_answer = part_1 "inputs/day11/input.txt" in
+  let part1_answer = sum_of_distances "inputs/day11/input.txt" 2 in
   Printf.printf "PART 1 ANSWER: %d\n" part1_answer;
-  let part2_answer = part_2 1_000_000 in
+  let part2_answer = part_2 "inputs/day11/input.txt" 1_000_000 in
   Printf.printf "PART 2 ANSWER %d\n" part2_answer
 ;;
